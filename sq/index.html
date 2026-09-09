@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGCSE Biology — Reproduction, Inheritance & Evolution Quiz</title>
+<style>
+:root {
+  --bg:#0b1020; --panel:#151c33; --panel2:#1c2642; --text:#f5f7ff; --muted:#aeb8d0;
+  --accent:#7c9cff; --good:#43d19e; --bad:#ff6b7a; --border:#2b385b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#0b1020,#101832 55%,#0b1020);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+.container{width:min(900px,94vw);margin:auto;padding:28px 0 45px}
+header{text-align:center;margin-bottom:20px}
+h1{font-size:clamp(1.7rem,4vw,2.7rem);margin:8px 0}
+.subtitle{color:var(--muted);line-height:1.5}
+.badge{display:inline-block;padding:7px 12px;border:1px solid var(--border);border-radius:999px;background:#111a30;color:#b9c7ff;font-size:.85rem}
+.topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:15px 0}
+.progress{height:10px;background:#0b1122;border-radius:99px;overflow:hidden;flex:1;border:1px solid var(--border)}
+.progress>div{height:100%;width:0;background:var(--accent);transition:.25s}
+.counter{color:var(--muted);font-weight:700;white-space:nowrap}
+.card{background:rgba(21,28,51,.96);border:1px solid var(--border);border-radius:20px;padding:25px;box-shadow:0 15px 45px rgba(0,0,0,.2)}
+.topic{color:#aebcff;font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800}
+.question{font-size:1.35rem;line-height:1.4;margin:10px 0 20px}
+.options{display:grid;gap:11px}
+.option{width:100%;text-align:left;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:15px 16px;border-radius:13px;cursor:pointer;font-size:1rem;transition:.15s}
+.option:hover:not(:disabled){transform:translateY(-1px);border-color:var(--accent);background:#233052}
+.option.correct{border-color:var(--good);background:rgba(67,209,158,.14)}
+.option.wrong{border-color:var(--bad);background:rgba(255,107,122,.14)}
+.option:disabled{cursor:default}
+.feedback{margin-top:17px;padding:14px;border-radius:12px;display:none;line-height:1.5}
+.feedback.show{display:block}
+.feedback.good{background:rgba(67,209,158,.12);border:1px solid rgba(67,209,158,.45)}
+.feedback.bad{background:rgba(255,107,122,.1);border:1px solid rgba(255,107,122,.4)}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+button.action{border:0;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer;background:var(--accent);color:#081022}
+button.secondary{background:#202b48;color:var(--text);border:1px solid var(--border)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.results{display:none;text-align:center}
+.score{font-size:4rem;font-weight:900;margin:12px 0}
+.grade{font-size:1.15rem;color:var(--muted);margin-bottom:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.stat{background:var(--panel2);border:1px solid var(--border);border-radius:13px;padding:15px}
+.stat b{font-size:1.4rem;display:block}
+.review{text-align:left;margin-top:22px}
+.review-item{border:1px solid var(--border);background:var(--panel2);padding:13px;border-radius:12px;margin:9px 0}
+.review-item b{display:block;margin-bottom:5px}
+.small{color:var(--muted);font-size:.9rem}
+footer{text-align:center;color:#7683a2;font-size:.78rem;margin-top:20px;line-height:1.5}
+@media(max-width:600px){.container{padding-top:18px}.card{padding:18px}.stats{grid-template-columns:1fr}.question{font-size:1.18rem}.topbar{align-items:flex-start;flex-direction:column}.progress{width:100%;flex:none}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <span class="badge">40 Questions • Interactive • IGCSE Biology</span>
+  <h1>Reproduction, Inheritance & Evolution</h1>
+  <div class="subtitle">Based on the two supplied PowerPoint revision decks.<br>Each question gives instant feedback and an explanation.</div>
+</header>
+
+<div id="quiz">
+  <div class="topbar">
+    <div class="progress"><div id="bar"></div></div>
+    <div class="counter" id="counter">1 / 40</div>
+  </div>
+  <section class="card">
+    <div class="topic" id="topic"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback"></div>
+    <div class="actions">
+      <button class="action secondary" id="prev" onclick="previousQuestion()">← Previous</button>
+      <button class="action" id="next" onclick="nextQuestion()" disabled>Next →</button>
+    </div>
+  </section>
+</div>
+
+<section class="card results" id="results">
+  <div class="topic">Quiz complete</div>
+  <h2>Your score</h2>
+  <div class="score" id="score"></div>
+  <div class="grade" id="grade"></div>
+  <div class="stats">
+    <div class="stat"><span class="small">Correct</span><b id="correctStat"></b></div>
+    <div class="stat"><span class="small">Incorrect</span><b id="wrongStat"></b></div>
+    <div class="stat"><span class="small">Percentage</span><b id="percentStat"></b></div>
+  </div>
+  <button class="action" onclick="restart()">Restart Quiz</button>
+  <div class="review" id="review"></div>
+</section>
+
+<footer>
+  Content is derived from the supplied “Evolution by Natural Selection” and “Reproduction and Inheritance” PowerPoint slides.
+</footer>
+</div>
+
+<script>
+const questions = [{"q": "What does variation refer to?", "a": ["Differences between individuals of the same species", "Differences only between different species", "Changes that happen during an individual's lifetime", "Differences caused only by climate"], "c": 0, "e": "Variation is defined as differences between individuals of the same species."}, {"q": "Which is an example of continuous variation?", "a": ["ABO blood group", "Human height", "Tongue rolling", "Attached/free earlobes"], "c": 1, "e": "Height shows a range of values with no distinct categories."}, {"q": "Which is an example of discontinuous variation?", "a": ["Body mass", "Finger length", "ABO blood group", "Human height"], "c": 2, "e": "ABO blood groups occur in distinct categories."}, {"q": "Which statement about phenotype is supported by the slides?", "a": ["It is determined only by genes", "It is determined only by the environment", "It is shaped by genotype and environment", "It never changes during life"], "c": 2, "e": "The slides state that phenotype is shaped by genetic and environmental factors."}, {"q": "What is a mutation?", "a": ["A planned change made by an organism", "A random change in the DNA base sequence", "A change caused only by exercise", "A type of cell division"], "c": 1, "e": "A mutation is described as a random, spontaneous change in DNA base sequence."}, {"q": "Which mutation can be inherited by offspring?", "a": ["A mutation in a skin cell", "A mutation in a muscle cell", "A mutation in a gamete", "Any mutation in a somatic cell"], "c": 2, "e": "Only mutations in gametes can be inherited."}, {"q": "Which process creates new combinations of existing alleles during meiosis?", "a": ["Crossing over", "Cytokinesis only", "DNA degradation", "Natural selection"], "c": 0, "e": "Crossing over exchanges segments between homologous chromosomes."}, {"q": "Approximately how many chromosomally distinct gametes can independent assortment produce in humans?", "a": ["23", "46", "About 8.4 million", "About 70 trillion"], "c": 2, "e": "Independent assortment alone gives about 2^23, or 8.4 million, combinations."}, {"q": "What happens when two haploid gametes fuse?", "a": ["A haploid zygote forms", "A diploid zygote forms", "A triploid zygote forms", "A clone forms"], "c": 1, "e": "n + n = 2n, restoring the diploid chromosome number."}, {"q": "Why is genetic variation important to populations?", "a": ["It prevents all reproduction", "It gives populations a better chance of surviving new challenges", "It guarantees every individual survives", "It stops mutations occurring"], "c": 1, "e": "Variation can provide individuals capable of surviving disease or environmental change."}, {"q": "What is the first step of natural selection in the five-step sequence?", "a": ["Reproduction", "Overproduction of offspring", "Allele frequency change", "Speciation"], "c": 1, "e": "Natural selection begins with overproduction of offspring."}, {"q": "Why does overproduction lead to competition?", "a": ["Resources are unlimited", "There are more offspring than available resources can support", "All offspring are genetically identical", "Mutations stop reproduction"], "c": 1, "e": "Food, space, water and mates are limited."}, {"q": "In natural selection, what does 'fittest' mean?", "a": ["Physically strongest", "Largest", "Best suited to the current environment", "Oldest"], "c": 2, "e": "Fitness means being better suited to the current environment, not necessarily physically strongest."}, {"q": "Which trait can be acted upon by natural selection?", "a": ["A heritable trait encoded in DNA", "A muscle gained through exercise", "A scar", "A learned accent"], "c": 0, "e": "The advantageous trait must have a genetic basis so it can be inherited."}, {"q": "What changes quantitatively as natural selection proceeds over generations?", "a": ["An individual's height", "Allele frequency in the population", "The number of chromosomes in every cell", "The age of each organism"], "c": 1, "e": "Evolution is measured as a change in allele frequency in a population."}, {"q": "Which statement about evolution is correct?", "a": ["Individuals evolve during their lifetime", "Populations evolve over generations", "Organisms evolve because they need to", "Evolution is always progressive"], "c": 1, "e": "The slides emphasize that populations, not individual organisms, evolve."}, {"q": "In MRSA, what acts as the selection pressure?", "a": ["Meiosis", "Antibiotics", "Sunlight", "Crossing over"], "c": 1, "e": "Antibiotics kill susceptible bacteria and select for resistant bacteria."}, {"q": "Which statement about antibiotic resistance is correct?", "a": ["Antibiotics create the useful mutation", "Resistance mutations can pre-exist before antibiotic exposure", "All bacteria become resistant at once", "Resistance is caused by bacteria wanting to survive"], "c": 1, "e": "The resistance mutation pre-exists; antibiotics select bacteria carrying it."}, {"q": "How can bacteria spread resistance genes laterally?", "a": ["Through plasmids and conjugation", "Through mitosis only", "Through photosynthesis", "Through fertilisation"], "c": 0, "e": "The slides describe horizontal gene transfer via plasmids through conjugation."}, {"q": "In the peppered moth example, what happened after industrial pollution blackened tree bark?", "a": ["Light moths became better camouflaged", "Dark moths were better camouflaged and increased in frequency", "Both colours disappeared", "Moths stopped reproducing"], "c": 1, "e": "Dark moths became better camouflaged and the dark allele increased."}, {"q": "What is selective breeding?", "a": ["Selection by environmental pressures only", "Humans deliberately choosing organisms with desired traits to breed", "Random mating in a population", "A type of mutation"], "c": 1, "e": "Selective breeding is artificial selection directed by humans."}, {"q": "What is the main selecting agent in artificial selection?", "a": ["The environment", "Humans", "Predators", "Bacteria"], "c": 1, "e": "Humans choose which organisms reproduce."}, {"q": "Which is the correct basic sequence for plant selective breeding?", "a": ["Select parents → cross-pollinate → grow/select offspring → repeat", "Cross-pollinate → mutate → clone → release", "Grow → harvest → stop", "Select animals → inseminate → stop"], "c": 0, "e": "The slides give the cycle: select, cross-pollinate, grow and assess, repeat."}, {"q": "What is emasculation in controlled plant cross-pollination?", "a": ["Adding pollen to a flower", "Removing stamens before pollen matures to prevent self-pollination", "Harvesting seeds", "Growing offspring"], "c": 1, "e": "The stamens are removed so only the desired pollen donor fertilises the plant."}, {"q": "What is a pure-breeding strain?", "a": ["A population with completely random traits", "A strain in which individuals are homozygous for alleles governing the desired trait", "A population with no DNA", "A group produced only by natural selection"], "c": 1, "e": "The slides define pure-breeding as homozygous for the alleles governing the desired trait."}, {"q": "Why can selective breeding reduce genetic diversity?", "a": ["It repeatedly selects a narrower set of traits and parents", "It always introduces new mutations", "It prevents reproduction", "It makes all organisms diploid"], "c": 0, "e": "Artificial selection can narrow the gene pool and reduce overall genetic diversity."}, {"q": "Which animal-breeding technology can greatly amplify the impact of an elite male?", "a": ["Artificial insemination", "Crossing over", "Cytokinesis", "Photosynthesis"], "c": 0, "e": "Artificial insemination can allow semen from an elite male to sire many offspring."}, {"q": "What is a key ethical concern associated with intense selective breeding mentioned in the slides?", "a": ["It can sometimes compromise animal welfare", "It always prevents reproduction", "It eliminates all environmental variation", "It makes organisms unable to mutate"], "c": 0, "e": "The slides note possible animal-welfare compromises and discuss inbreeding consequences."}, {"q": "What does punctuated equilibrium describe?", "a": ["The chemical structure of DNA", "The pace and pattern of evolutionary change through geological time", "How mitosis produces cells", "How antibiotics work"], "c": 1, "e": "It describes long periods of stability interrupted by relatively rapid evolutionary change."}, {"q": "During the 'punctuation' phase, what commonly happens?", "a": ["A large population remains completely connected", "A small geographically isolated population evolves rapidly under new pressures", "All mutations stop", "Only individuals, not populations, evolve"], "c": 1, "e": "The slides describe small, isolated peripheral populations evolving rapidly with little gene flow."}, {"q": "What is the main difference between sexual and asexual reproduction?", "a": ["Asexual reproduction uses two parents", "Sexual reproduction involves fusion of gametes", "Sexual reproduction always produces clones", "Asexual reproduction requires fertilisation"], "c": 1, "e": "Sexual reproduction involves fusion of haploid gametes from two parents."}, {"q": "What are offspring produced by asexual reproduction called?", "a": ["Gametes", "Clones", "Zygotes", "Haploids"], "c": 1, "e": "Asexual offspring are genetically identical clones."}, {"q": "In humans, how many chromosomes are in a normal gamete?", "a": ["46", "23", "44", "92"], "c": 1, "e": "Human gametes are haploid and contain 23 chromosomes."}, {"q": "Which structure contains chromosomes in a eukaryotic cell?", "a": ["Nucleus", "Ribosome", "Cell wall", "Cytoplasm only"], "c": 0, "e": "The slides describe the nucleus as the membrane-bound organelle housing chromosomes."}, {"q": "Which DNA base pairs with adenine?", "a": ["Guanine", "Cytosine", "Thymine", "Uracil"], "c": 2, "e": "A pairs with T using two hydrogen bonds."}, {"q": "What is an allele?", "a": ["A complete chromosome", "An alternative form of a gene", "The entire nucleus", "A type of gamete"], "c": 1, "e": "An allele is one of two or more alternative forms of a gene."}, {"q": "Which genotype is heterozygous?", "a": ["BB", "bb", "Bb", "B"], "c": 2, "e": "Heterozygous means carrying two different alleles, such as Bb."}, {"q": "Which genotype expresses a recessive phenotype according to the slides?", "a": ["BB", "Bb", "bb", "Any genotype containing B"], "c": 2, "e": "A recessive phenotype requires two recessive alleles: bb."}, {"q": "What is the result of mitosis in a human diploid cell?", "a": ["Four genetically different haploid cells", "Two genetically identical diploid daughter cells", "Two haploid gametes", "One triploid cell"], "c": 1, "e": "Mitosis produces two genetically identical diploid daughter cells."}, {"q": "Which statement correctly compares mitosis and meiosis?", "a": ["Mitosis produces 4 haploid cells; meiosis produces 2 diploid cells", "Mitosis has 1 division and produces 2 diploid cells; meiosis has 2 divisions and produces 4 haploid cells", "Both produce four identical cells", "Both are used only for gamete formation"], "c": 1, "e": "This is the key comparison given in the slides."}];
+let current = 0;
+let answers = Array(questions.length).fill(null);
+let locked = Array(questions.length).fill(false);
+
+function topicFor(i) {
+  return i < 30 ? "Evolution & Natural Selection" : "Reproduction & Inheritance";
+}
+function render() {
+  const q = questions[current];
+  document.getElementById('counter').textContent = `${current+1} / ${questions.length}`;
+  document.getElementById('bar').style.width = `${((current+1)/questions.length)*100}%`;
+  document.getElementById('topic').textContent = topicFor(current);
+  document.getElementById('question').textContent = q.q;
+  const options = document.getElementById('options');
+  options.innerHTML = '';
+  q.a.forEach((text, idx) => {
+    const b = document.createElement('button');
+    b.className = 'option';
+    b.textContent = `${String.fromCharCode(65+idx)}. ${text}`;
+    b.onclick = () => choose(idx);
+    if (locked[current]) {
+      b.disabled = true;
+      if (idx === q.c) b.classList.add('correct');
+      if (idx === answers[current] && idx !== q.c) b.classList.add('wrong');
+    }
+    options.appendChild(b);
+  });
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  if (locked[current]) {
+    const good = answers[current] === q.c;
+    fb.classList.add('show', good ? 'good' : 'bad');
+    fb.innerHTML = `<strong>${good ? '✓ Correct!' : '✗ Incorrect'}</strong><br>${q.e}`;
+  }
+  document.getElementById('next').disabled = !locked[current];
+  document.getElementById('prev').disabled = current === 0;
+}
+function choose(idx) {
+  if (locked[current]) return;
+  answers[current] = idx;
+  locked[current] = true;
+  render();
+}
+function nextQuestion() {
+  if (!locked[current]) return;
+  if (current < questions.length - 1) {
+    current++;
+    render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    showResults();
+  }
+}
+function previousQuestion() {
+  if (current > 0) {
+    current--;
+    render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  const correct = answers.filter((x,i)=>x===questions[i].c).length;
+  const pct = Math.round(correct/questions.length*100);
+  document.getElementById('score').textContent = `${correct} / ${questions.length}`;
+  document.getElementById('correctStat').textContent = correct;
+  document.getElementById('wrongStat').textContent = questions.length-correct;
+  document.getElementById('percentStat').textContent = pct + '%';
+  document.getElementById('grade').textContent =
+    pct >= 90 ? 'Excellent — very strong mastery!' :
+    pct >= 80 ? 'Great work — strong understanding.' :
+    pct >= 70 ? 'Good job — review the missed topics.' :
+    pct >= 60 ? 'Keep studying — another attempt should help.' :
+    'Review the slides and try again.';
+  const review = document.getElementById('review');
+  const missed = questions.map((q,i)=>({q,i})).filter(x=>answers[x.i]!==x.q.c);
+  review.innerHTML = missed.length ? '<h3>Questions to review</h3>' +
+    missed.map(x=>`<div class="review-item"><b>Q${x.i+1}. ${x.q.q}</b><span class="small">Correct answer: ${x.q.a[x.q.c]}</span></div>`).join('') :
+    '<h3>Perfect score 🎉</h3><p class="small">You answered every question correctly.</p>';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restart() {
+  current = 0;
+  answers = Array(questions.length).fill(null);
+  locked = Array(questions.length).fill(false);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+render();
+</script>
+</body>
+</html>
